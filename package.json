@@ -1,0 +1,10 @@
+{
+  "name": "SlotMachine",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "SoRa <sonamraisx007@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "prompt-sync": "^4.2.0"
+  }
+}
