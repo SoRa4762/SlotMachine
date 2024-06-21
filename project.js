@@ -75,7 +75,7 @@ const spin = () => {
   const symbols = []; //in array though, if you append stuff in array, it wont violate the const keyword
   for (const [symbol, count] of Object.entries(SYMBOLS_COUNT)) {
     //turns object to arrays of array -> cuz object is not iterable
-    console.log(symbol, count);
+    // console.log(symbol, count);
     for (let i = 0; i < count; i++) {
       symbols.push(symbol);
     }
@@ -93,23 +93,85 @@ const spin = () => {
     }
   }
 
-  console.log("Reels: ", reels);
+  // console.log("Reels: ", reels);
   return reels;
 };
 
 const transpose = (reels) => {
   const newReels = [];
   for (let i = 0; i < COLS; i++) {
+    newReels.push([]);
     for (let j = 0; j < ROWS; j++) {
-      newReels.push(reels[j][i]);
+      newReels[i].push(reels[j][i]);
     }
   }
-  console.log(newReels);
+  // console.log(newReels);
   return newReels;
 };
 
-let balance = deposit();
-const linesNumber = numberOfLines();
-const betAmount = getBet(balance, linesNumber);
-const reels = spin();
-const tranpose = transpose(reels);
+const beautifyReels = (transpose) => {
+  for (const row of transpose) {
+    let stringify = "";
+    for (const [i, symbol] of row.entries()) {
+      stringify += symbol;
+      if (i < row.length - 1) {
+        stringify += " | ";
+      }
+    }
+    console.log(stringify);
+  }
+};
+
+const checkWinnings = (bet, lines, transpose) => {
+  let winnings = 0;
+
+  for (let i = 0; i < lines; i++) {
+    const row = transpose[i];
+    let isSame = true;
+
+    for (r of row) {
+      if (r != row[0]) {
+        isSame = false;
+        break;
+      }
+    }
+
+    if (isSame) {
+      winnings += bet * SYMBOL_VALUES[row[0]];
+    }
+  }
+  return winnings;
+};
+
+const game = () => {
+  let balance = deposit();
+
+  while (true) {
+    console.log(`Your current balance is $${balance}`);
+    const linesNumber = numberOfLines();
+    const betAmount = getBet(balance, linesNumber);
+    balance -= betAmount * linesNumber;
+
+    const reels = spin();
+    const tranpose = transpose(reels);
+    beautifyReels(tranpose);
+    const winnings = checkWinnings(betAmount, linesNumber, tranpose);
+    balance += winnings;
+
+    console.log(`You have won $${winnings}`);
+
+    if (balance <= 0) {
+      console.log("Your money has finished, you are out of the game!");
+      break;
+    }
+
+    const playAgain = prompt("Would you like to play again? (y/n) ");
+
+    if (playAgain != "y") {
+      console.log("Thank you for playing this game!");
+      break;
+    }
+  }
+};
+
+game();
